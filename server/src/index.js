@@ -110,7 +110,7 @@ const broadcast = (data) =>
 router.post('/request', ctx => {
   // console.log("ctx: " + JSON.stringify(ctx));
   const headers = ctx.request.body;
-  // console.log("body: " + JSON.stringify(headers));
+  console.log("body: " + JSON.stringify(headers));
   const name = headers.name;
   const status = headers.status;
   const student = headers.student;
