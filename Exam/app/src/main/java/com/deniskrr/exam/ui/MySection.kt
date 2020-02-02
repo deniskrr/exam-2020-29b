@@ -24,10 +24,10 @@ fun MySectionScreen() {
         MainActivity.SHARED_PREFERENCES_NAME,
         Context.MODE_PRIVATE
     )
-    val appState = remember { MySectionState(RemoteRepository(), sharedPreferences) }
+    val mySectionState = remember { MySectionState(RemoteRepository(), sharedPreferences) }
 
     Container(padding = EdgeInsets(16.dp)) {
-        MySectionContent(appState)
+        MySectionContent(mySectionState)
     }
 }
 

@@ -22,7 +22,7 @@ fun RequestRow(request: Request, onClick: () -> Unit = {}) {
                         style = MaterialTheme.typography().body1.copy(Color.DarkGray)
                     )
                     Text(
-                        text = "${request.cost} (${request.eCost}",
+                        text = "${request.cost} (${request.eCost})",
                         style = MaterialTheme.typography().caption
                     )
                 }

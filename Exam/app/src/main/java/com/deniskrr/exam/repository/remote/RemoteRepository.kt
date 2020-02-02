@@ -34,4 +34,8 @@ class RemoteRepository : Repository {
         api.changeRequestStatus(request).enqueue(callback)
     }
 
+    override fun getFilledRequestDescendingByCost(callback: Callback<List<Request>>) {
+        api.getFilledRequestDescendingByCost().enqueue(callback)
+    }
+
 }

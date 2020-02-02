@@ -8,4 +8,5 @@ interface Repository {
     fun getRequestsOfStudent(studentName: String, callback: Callback<List<Request>>)
     fun getOpenRequests(callback: Callback<List<Request>>)
     fun changeRequestStatus(request: Request, callback: Callback<Request>)
+    fun getFilledRequestDescendingByCost(callback: Callback<List<Request>>)
 }

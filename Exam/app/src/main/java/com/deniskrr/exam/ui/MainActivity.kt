@@ -56,6 +56,7 @@ fun AppContent() {
         when (screen) {
             is Screen.MySection -> MySectionScreen()
             is Screen.AllSection -> AllSectionScreen()
+            is Screen.Reports -> ReportsScreen()
         }
     }
 }

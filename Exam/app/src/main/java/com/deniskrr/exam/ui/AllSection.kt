@@ -33,18 +33,6 @@ fun AllSectionScreen() {
 @Composable
 private fun AllSectionContent(allSectionState: AllSectionState) {
     Column {
-        Button(text = "See all requests", onClick = {
-            allSectionState.getOpenRequests()
-        })
-        Spacer(modifier = LayoutHeight(16.dp))
-        RequestList(allSectionState = allSectionState)
-    }
-}
-
-@Composable
-private fun RequestList(allSectionState: AllSectionState) {
-
-    Column {
         val idEditorModel = state { EditorModel() }
         val costEditorModel = state { EditorModel() }
         val statusEditorModel = state { EditorModel() }
@@ -70,6 +58,18 @@ private fun RequestList(allSectionState: AllSectionState) {
                     status = statusEditorModel.value.text
                 )
             )
+        })
+        Spacer(modifier = LayoutHeight(16.dp))
+        RequestList(allSectionState = allSectionState)
+    }
+}
+
+@Composable
+private fun RequestList(allSectionState: AllSectionState) {
+
+    Column {
+        Button(text = "See all requests", onClick = {
+            allSectionState.getOpenRequests()
         })
         VerticalScroller {
             Column {

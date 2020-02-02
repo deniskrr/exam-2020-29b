@@ -19,4 +19,7 @@ interface ServerApi {
 
     @POST("/change")
     fun changeRequestStatus(@Body request: Request): Call<Request>
+
+    @GET("/filled")
+    fun getFilledRequestDescendingByCost(): Call<List<Request>>
 }
