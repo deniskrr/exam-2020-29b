@@ -18,7 +18,7 @@ class RemoteRepository : Repository {
         api = retrofit.create<ServerApi>(ServerApi::class.java)
     }
 
-    override fun recordRequest(request: Request, callback: Callback<Void>) {
+    override fun recordRequest(request: Request, callback: Callback<Request>) {
         api.recordRequest(request).enqueue(callback)
     }
 }

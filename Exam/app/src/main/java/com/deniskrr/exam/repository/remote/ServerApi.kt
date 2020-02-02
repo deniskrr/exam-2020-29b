@@ -7,5 +7,5 @@ import retrofit2.http.POST
 
 interface ServerApi {
     @POST("/request")
-    fun recordRequest(@Body request: Request): Call<Void>
+    fun recordRequest(@Body request: Request): Call<Request>
 }
