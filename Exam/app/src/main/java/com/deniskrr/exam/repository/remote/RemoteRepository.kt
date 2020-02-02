@@ -30,4 +30,8 @@ class RemoteRepository : Repository {
         api.getOpenRequests().enqueue(callback)
     }
 
+    override fun changeRequestStatus(request: Request, callback: Callback<Request>) {
+        api.changeRequestStatus(request).enqueue(callback)
+    }
+
 }

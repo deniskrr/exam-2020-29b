@@ -16,4 +16,7 @@ interface ServerApi {
 
     @GET("/open")
     fun getOpenRequests(): Call<List<Request>>
+
+    @POST("/change")
+    fun changeRequestStatus(@Body request: Request): Call<Request>
 }

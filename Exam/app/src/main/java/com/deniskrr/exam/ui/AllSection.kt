@@ -6,10 +6,11 @@ import androidx.compose.Model
 import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
 import androidx.compose.remember
+import androidx.compose.state
+import androidx.ui.core.EditorModel
 import androidx.ui.foundation.VerticalScroller
-import androidx.ui.layout.Column
-import androidx.ui.layout.Container
-import androidx.ui.layout.EdgeInsets
+import androidx.ui.input.KeyboardType
+import androidx.ui.layout.*
 import androidx.ui.material.Button
 import androidx.ui.unit.dp
 import com.deniskrr.exam.model.Request
@@ -30,29 +31,62 @@ fun AllSectionScreen() {
 }
 
 @Composable
-fun AllSectionContent(allSectionState: AllSectionState) {
+private fun AllSectionContent(allSectionState: AllSectionState) {
     Column {
         Button(text = "See all requests", onClick = {
             allSectionState.getOpenRequests()
         })
+        Spacer(modifier = LayoutHeight(16.dp))
         RequestList(allSectionState = allSectionState)
     }
 }
 
 @Composable
 private fun RequestList(allSectionState: AllSectionState) {
-    VerticalScroller {
-        Column {
-            allSectionState.requests.forEach { request ->
-                RequestRow(request = request)
+
+    Column {
+        val idEditorModel = state { EditorModel() }
+        val costEditorModel = state { EditorModel() }
+        val statusEditorModel = state { EditorModel() }
+        ExamTextField(
+            label = "Id",
+            editorModel = idEditorModel,
+            keyboardType = KeyboardType.Number
+        )
+        Spacer(modifier = LayoutHeight(8.dp))
+        ExamTextField(
+            label = "Cost",
+            editorModel = costEditorModel,
+            keyboardType = KeyboardType.Number
+        )
+        Spacer(modifier = LayoutHeight(8.dp))
+        ExamTextField(label = "Status", editorModel = statusEditorModel)
+        Spacer(modifier = LayoutHeight(8.dp))
+        Button(text = "Change", onClick = {
+            allSectionState.changeRequestStatus(
+                Request(
+                    id = idEditorModel.value.text.toInt(),
+                    cost = costEditorModel.value.text.toInt(),
+                    status = statusEditorModel.value.text
+                )
+            )
+        })
+        VerticalScroller {
+            Column {
+                allSectionState.requests.forEach { request ->
+                    RequestRow(request = request)
+                }
             }
         }
     }
-
 }
 
 @Model
 class AllSectionState(private val repository: Repository) {
+    companion object {
+        const val TAG = "AllSectionState"
+    }
+
     val requests: ModelList<Request> = modelListOf()
 
     fun getOpenRequests() {
@@ -73,6 +107,29 @@ class AllSectionState(private val repository: Repository) {
                     Log.d(MySectionState.TAG, "Successfully retrieved all open requests")
                 } else {
                     Log.d(MySectionState.TAG, "Failed retrieving all open requests")
+                }
+            }
+        })
+    }
+
+    fun changeRequestStatus(request: Request) {
+        repository.changeRequestStatus(request, object : Callback<Request> {
+            override fun onFailure(call: Call<Request>, t: Throwable) {
+                Log.e(TAG, "Error changing request status", t)
+            }
+
+            override fun onResponse(call: Call<Request>, response: Response<Request>) {
+                if (response.isSuccessful) {
+                    val responseRequest = response.body()!!
+                    Log.d(
+                        MySectionState.TAG,
+                        "Successfully changed request ${responseRequest.name} status to ${request.status}"
+                    )
+                } else {
+                    Log.d(
+                        MySectionState.TAG,
+                        "Failed changing request ${request.name} status to ${request.status}"
+                    )
                 }
             }
         })

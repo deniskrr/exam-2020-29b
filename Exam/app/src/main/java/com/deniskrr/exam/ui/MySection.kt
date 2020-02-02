@@ -69,6 +69,7 @@ fun RequestRecorder(mySectionState: MySectionState) {
 
         Button(text = "Send request", onClick = {
             val request = Request(
+                0,
                 nameEditorModel.value.text,
                 statusEditorModel.value.text,
                 mySectionState.studentName,
@@ -115,7 +116,7 @@ class MySectionState(
     private val sharedPreferences: SharedPreferences
 ) {
     companion object {
-        const val TAG = "AppState"
+        const val TAG = "MySectionState"
         const val STUDENT_PREFS_KEY = "Student"
     }
 
