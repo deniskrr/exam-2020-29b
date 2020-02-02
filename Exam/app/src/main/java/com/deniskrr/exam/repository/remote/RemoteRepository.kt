@@ -21,4 +21,9 @@ class RemoteRepository : Repository {
     override fun recordRequest(request: Request, callback: Callback<Request>) {
         api.recordRequest(request).enqueue(callback)
     }
+
+    override fun getRequestsOfStudent(studentName: String, callback: Callback<List<Request>>) {
+        api.getRequestsOfStudent(studentName).enqueue(callback)
+    }
+
 }

@@ -1,38 +1,46 @@
 package com.deniskrr.exam.ui.my_section
 
-import android.content.Context
 import androidx.compose.Composable
-import androidx.compose.ambient
 import androidx.compose.state
-import androidx.ui.core.ContextAmbient
 import androidx.ui.core.EditorModel
 import androidx.ui.core.Text
 import androidx.ui.core.TextField
 import androidx.ui.layout.Column
 import androidx.ui.material.Button
 import androidx.ui.material.TopAppBar
+import com.deniskrr.exam.ui.AppState
 
 @Composable
-fun MySectionScreen() {
+fun MySectionScreen(appState: AppState) {
     Column {
         TopAppBar(title = { Text("My Section") })
-        MySectionContent()
+        MySectionContent(appState)
     }
 }
 
 @Composable
-fun MySectionContent() {
-    StudentNameForm()
+fun MySectionContent(appState: AppState) {
+    Column {
+        StudentNameForm(appState)
+        RequestList(appState)
+    }
 }
 
 @Composable
-fun StudentNameForm() {
-    val studentNameKey = "StudentName"
+fun RequestList(appState: AppState) {
+    Column {
+        Button(text = "Refresh list", onClick = {
+            appState.getRequestsOfStudent(appState.studentName)
+        })
+        appState.requests.forEach {
+            Text(text = it.student)
+        }
+    }
+}
 
-    val context = ambient(key = ContextAmbient)
-    val preferences = context.getSharedPreferences("Student", Context.MODE_PRIVATE)
-
-    val studentName = preferences.getString(studentNameKey, "")!!
+@Composable
+fun StudentNameForm(appState: AppState) {
+    val studentName = appState.studentName
     val state = state { EditorModel(studentName) }
     Column {
         TextField(value = state.value, onValueChange = { newName ->
@@ -40,7 +48,7 @@ fun StudentNameForm() {
         })
 
         Button(text = "Save name", onClick = {
-            preferences.edit().putString(studentNameKey, state.value.text).apply()
+            appState.studentName = state.value.text
         })
     }
 }
