@@ -13,4 +13,7 @@ interface ServerApi {
 
     @GET("/my/{studentName}")
     fun getRequestsOfStudent(@Path("studentName") studentName: String): Call<List<Request>>
+
+    @GET("/open")
+    fun getOpenRequests(): Call<List<Request>>
 }

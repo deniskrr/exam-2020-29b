@@ -26,4 +26,8 @@ class RemoteRepository : Repository {
         api.getRequestsOfStudent(studentName).enqueue(callback)
     }
 
+    override fun getOpenRequests(callback: Callback<List<Request>>) {
+        api.getOpenRequests().enqueue(callback)
+    }
+
 }
