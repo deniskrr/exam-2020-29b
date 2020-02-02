@@ -11,18 +11,10 @@ import androidx.compose.Context
 import androidx.compose.Model
 import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
-import androidx.compose.state
 import androidx.ui.animation.Crossfade
-import androidx.ui.core.Text
 import androidx.ui.core.setContent
-import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.layout.Column
-import androidx.ui.layout.LayoutHeight
-import androidx.ui.layout.Padding
-import androidx.ui.layout.Spacer
-import androidx.ui.material.*
-import androidx.ui.material.surface.Surface
-import androidx.ui.unit.dp
+import androidx.ui.material.MaterialTheme
 import com.deniskrr.exam.lightThemeColors
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
@@ -134,83 +126,19 @@ class AppState(
 
 @Composable
 fun ExamApp(appState: AppState) {
-    val (drawerState, onDrawerStateChange) = state { DrawerState.Closed }
-
     MaterialTheme(colors = lightThemeColors, typography = themeTypography) {
-        ModalDrawerLayout(
-            drawerState = drawerState,
-            onStateChange = onDrawerStateChange,
-            gesturesEnabled = drawerState == DrawerState.Opened,
-            drawerContent = {
-                AppDrawer(
-                    currentScreen = Navigator.currentScreen,
-                    closeDrawer = { onDrawerStateChange(DrawerState.Closed) }
-                )
-            },
-            bodyContent = { AppContent(appState) { onDrawerStateChange(DrawerState.Opened) } }
-        )
+        Column {
+            TabBar()
+            AppContent(appState = appState)
+        }
     }
 }
 
-
 @Composable
-fun AppContent(appState: AppState, openDrawer: () -> Unit) {
+fun AppContent(appState: AppState) {
     Crossfade(Navigator.currentScreen) { screen ->
         when (screen) {
-            is Screen.MySection -> MySectionScreen(appState) { openDrawer() }
+            is Screen.MySection -> MySectionScreen(appState)
         }
     }
 }
-
-@Composable
-private fun AppDrawer(
-    currentScreen: Screen,
-    closeDrawer: () -> Unit
-) {
-    Column {
-        Spacer(modifier = LayoutHeight(24.dp))
-        DrawerButton(
-            label = "My Section",
-            isSelected = currentScreen == Screen.MySection
-        ) {
-            navigateTo(Screen.MySection)
-            closeDrawer()
-        }
-
-        DrawerButton(
-            label = "All Section",
-            isSelected = currentScreen == Screen.AllSection
-        ) {
-            navigateTo(Screen.AllSection)
-            closeDrawer()
-        }
-    }
-}
-
-@Composable
-private fun DrawerButton(
-    label: String,
-    isSelected: Boolean,
-    action: () -> Unit
-) {
-    val backgroundColor = if (isSelected) {
-        MaterialTheme.colors().primary.copy(alpha = 0.12f)
-    } else {
-        MaterialTheme.colors().surface
-    }
-
-    Padding(left = 8.dp, top = 8.dp, right = 8.dp) {
-        Surface(
-            color = backgroundColor,
-            shape = RoundedCornerShape(4.dp)
-        ) {
-            Button(onClick = action, style = TextButtonStyle()) {
-                Text(
-                    text = label
-                )
-            }
-        }
-    }
-}
-
-
