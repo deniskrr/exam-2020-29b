@@ -3,7 +3,9 @@ package com.deniskrr.exam.ui
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.Composable
 import androidx.compose.Model
+import androidx.ui.animation.Crossfade
 import androidx.ui.core.setContent
 import androidx.ui.material.MaterialTheme
 import com.deniskrr.exam.model.Request
@@ -20,10 +22,11 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             MaterialTheme {
-                MySectionScreen()
+                AppContent()
             }
         }
     }
+
 }
 
 @Model
@@ -47,6 +50,15 @@ class AppState(private val repository: Repository) {
 
         })
     }
-
 }
+
+@Composable
+fun AppContent() {
+    Crossfade(Navigator.currentScreen) { screen ->
+        when (screen) {
+            is Screen.MySection -> MySectionScreen()
+        }
+    }
+}
+
 
