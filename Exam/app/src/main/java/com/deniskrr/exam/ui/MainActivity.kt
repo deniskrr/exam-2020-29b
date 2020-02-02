@@ -2,7 +2,6 @@ package com.deniskrr.exam.ui
 
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
-import android.net.Network
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -50,15 +49,7 @@ class MainActivity : AppCompatActivity() {
             getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.registerDefaultNetworkCallback(object :
             ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                super.onAvailable(network)
-                appState.isConnected = true
-            }
 
-            override fun onLost(network: Network) {
-                super.onLost(network)
-                appState.isConnected = false
-            }
         })
     }
 }
