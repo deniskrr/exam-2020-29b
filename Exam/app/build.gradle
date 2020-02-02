@@ -5,6 +5,10 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 29
 
+    composeOptions {
+        kotlinCompilerExtensionVersion "0.1.0-dev04"
+    }
+
     defaultConfig {
         applicationId "com.deniskrr.exam"
         minSdkVersion 21
