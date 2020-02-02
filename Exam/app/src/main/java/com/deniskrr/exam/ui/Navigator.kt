@@ -4,6 +4,7 @@ import androidx.compose.Model
 
 sealed class Screen {
     object MySection : Screen()
+    object AllSection : Screen()
 }
 
 @Model

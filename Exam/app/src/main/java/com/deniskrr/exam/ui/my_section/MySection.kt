@@ -5,16 +5,24 @@ import androidx.compose.state
 import androidx.ui.core.EditorModel
 import androidx.ui.core.Text
 import androidx.ui.core.TextField
-import androidx.ui.layout.Column
+import androidx.ui.foundation.Clickable
+import androidx.ui.layout.*
 import androidx.ui.material.Button
 import androidx.ui.material.TopAppBar
+import androidx.ui.unit.dp
 import com.deniskrr.exam.ui.AppState
 
 @Composable
-fun MySectionScreen(appState: AppState) {
+fun MySectionScreen(appState: AppState, openDrawer: () -> Unit) {
     Column {
-        TopAppBar(title = { Text("My Section") })
-        MySectionContent(appState)
+        TopAppBar(title = {
+            Clickable(onClick = openDrawer) {
+                Text(text = "My Section")
+            }
+        })
+        Container(padding = EdgeInsets(16.dp)) {
+            MySectionContent(appState)
+        }
     }
 }
 
@@ -22,6 +30,7 @@ fun MySectionScreen(appState: AppState) {
 fun MySectionContent(appState: AppState) {
     Column {
         StudentNameForm(appState)
+        Spacer(modifier = LayoutHeight(16.dp))
         RequestList(appState)
     }
 }
@@ -46,6 +55,8 @@ fun StudentNameForm(appState: AppState) {
         TextField(value = state.value, onValueChange = { newName ->
             state.value = newName
         })
+
+        Spacer(modifier = LayoutHeight(8.dp))
 
         Button(text = "Save name", onClick = {
             appState.studentName = state.value.text
