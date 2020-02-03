@@ -10,6 +10,7 @@ import androidx.ui.core.EditorModel
 import androidx.ui.input.KeyboardType
 import androidx.ui.layout.*
 import androidx.ui.material.Button
+import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.unit.dp
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
@@ -28,6 +29,9 @@ fun MySectionScreen() {
 
     Container(padding = EdgeInsets(16.dp)) {
         MySectionContent(mySectionState)
+    }
+    if (mySectionState.isLoading) Center {
+        CircularProgressIndicator()
     }
 }
 
@@ -119,8 +123,7 @@ class MySectionState(
         const val STUDENT_PREFS_KEY = "Student"
     }
 
-    var isConnected = false
-
+    var isLoading: Boolean = false
     var studentName: String
         get() = sharedPreferences.getString(STUDENT_PREFS_KEY, "")!!
         set(value) =
@@ -129,9 +132,11 @@ class MySectionState(
     val requests: ModelList<Request> = modelListOf()
 
     fun recordRequest(request: Request) {
+        isLoading = true
         repository.recordRequest(request, object : Callback<Request> {
             override fun onFailure(call: Call<Request>, t: Throwable) {
                 Log.e(TAG, "Error recording request", t)
+                isLoading = false
             }
 
             override fun onResponse(call: Call<Request>, response: Response<Request>) {
@@ -141,14 +146,17 @@ class MySectionState(
                 } else {
                     Log.d(TAG, "Failed recording request ${request.name}")
                 }
+                isLoading = false
             }
         })
     }
 
     fun getRequestsOfStudent(studentName: String) {
+        isLoading = true
         repository.getRequestsOfStudent(studentName, object : Callback<List<Request>> {
             override fun onFailure(call: Call<List<Request>>, t: Throwable) {
                 Log.e(TAG, "Error getting requests of student", t)
+                isLoading = false
             }
 
             override fun onResponse(call: Call<List<Request>>, response: Response<List<Request>>) {
@@ -164,6 +172,7 @@ class MySectionState(
                 } else {
                     Log.d(TAG, "Failed retrieving requests of $studentName")
                 }
+                isLoading = false
             }
         })
     }

@@ -6,10 +6,12 @@ import androidx.compose.Model
 import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
 import androidx.compose.remember
+import androidx.ui.layout.Center
 import androidx.ui.layout.Column
 import androidx.ui.layout.Container
 import androidx.ui.layout.EdgeInsets
 import androidx.ui.material.Button
+import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.unit.dp
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
@@ -24,6 +26,10 @@ fun ReportsScreen() {
 
     Container(padding = EdgeInsets(16.dp)) {
         ReportsContent(reportsState)
+    }
+
+    if (reportsState.isLoading) Center {
+        CircularProgressIndicator()
     }
 }
 
@@ -49,12 +55,19 @@ private fun RequestList(reportsState: ReportsState) {
 
 @Model
 class ReportsState(private val repository: Repository) {
+    companion object {
+        const val TAG = "Reports"
+    }
+
+    var isLoading: Boolean = false
     val requests: ModelList<Request> = modelListOf()
 
     fun getFilledRequestDescendingByCost() {
+        isLoading = true
         repository.getFilledRequestDescendingByCost(object : Callback<List<Request>> {
             override fun onFailure(call: Call<List<Request>>, t: Throwable) {
-                Log.e(MySectionState.TAG, "Error retrieving filled requests sorted by cost", t)
+                isLoading = false
+                Log.e(TAG, "Error retrieving filled requests sorted by cost", t)
             }
 
             override fun onResponse(call: Call<List<Request>>, response: Response<List<Request>>) {
@@ -63,18 +76,19 @@ class ReportsState(private val repository: Repository) {
 
                     with(requests) {
                         clear()
-                        addAll(responseRequests.sortedByDescending {
-                            it.cost
+                        addAll(responseRequests.sortedByDescending { request ->
+                            request.cost
                         })
                     }
 
                     Log.d(
-                        MySectionState.TAG,
+                        TAG,
                         "Successfully retrieved filled requests sorted by cost"
                     )
                 } else {
-                    Log.d(MySectionState.TAG, "Failed retrieving filled requests sorted by cost")
+                    Log.d(TAG, "Failed retrieving filled requests sorted by cost")
                 }
+                isLoading = false
             }
         })
     }

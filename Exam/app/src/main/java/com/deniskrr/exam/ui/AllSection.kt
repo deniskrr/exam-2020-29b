@@ -12,6 +12,7 @@ import androidx.ui.foundation.VerticalScroller
 import androidx.ui.input.KeyboardType
 import androidx.ui.layout.*
 import androidx.ui.material.Button
+import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.unit.dp
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
@@ -27,6 +28,10 @@ fun AllSectionScreen() {
 
     Container(padding = EdgeInsets(16.dp)) {
         AllSectionContent(allSectionState)
+    }
+
+    if (allSectionState.isLoading) Center {
+        CircularProgressIndicator()
     }
 }
 
@@ -88,10 +93,14 @@ class AllSectionState(private val repository: Repository) {
     }
 
     val requests: ModelList<Request> = modelListOf()
+    var isLoading: Boolean = false
 
     fun getOpenRequests() {
+        isLoading = true
+
         repository.getOpenRequests(object : Callback<List<Request>> {
             override fun onFailure(call: Call<List<Request>>, t: Throwable) {
+                isLoading = false
                 Log.e(MySectionState.TAG, "Error getting all open requests", t)
             }
 
@@ -108,14 +117,18 @@ class AllSectionState(private val repository: Repository) {
                 } else {
                     Log.d(MySectionState.TAG, "Failed retrieving all open requests")
                 }
+                isLoading = false
             }
         })
     }
 
     fun changeRequestStatus(request: Request) {
+        isLoading = true
+
         repository.changeRequestStatus(request, object : Callback<Request> {
             override fun onFailure(call: Call<Request>, t: Throwable) {
                 Log.e(TAG, "Error changing request status", t)
+                isLoading = false
             }
 
             override fun onResponse(call: Call<Request>, response: Response<Request>) {
@@ -131,6 +144,7 @@ class AllSectionState(private val repository: Repository) {
                         "Failed changing request ${request.name} status to ${request.status}"
                     )
                 }
+                isLoading = false
             }
         })
     }
