@@ -109,7 +109,6 @@ fun StudentNameForm(mySectionState: MySectionState) {
     }
 }
 
-
 @Model
 class MySectionState(
     private val repository: Repository,
