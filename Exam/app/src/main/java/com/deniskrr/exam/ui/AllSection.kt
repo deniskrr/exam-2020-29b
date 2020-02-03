@@ -8,12 +8,15 @@ import androidx.compose.frames.modelListOf
 import androidx.compose.remember
 import androidx.compose.state
 import androidx.ui.core.EditorModel
+import androidx.ui.core.Text
 import androidx.ui.foundation.VerticalScroller
 import androidx.ui.input.KeyboardType
 import androidx.ui.layout.*
+import androidx.ui.material.AlertDialog
 import androidx.ui.material.Button
 import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.unit.dp
+import com.deniskrr.exam.extensions.getErrorMessage
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
 import com.deniskrr.exam.repository.remote.RemoteRepository
@@ -32,6 +35,15 @@ fun AllSectionScreen() {
 
     if (allSectionState.isLoading) Center {
         CircularProgressIndicator()
+    }
+
+    if (allSectionState.errorMessage.isNotBlank()) {
+        AlertDialog(
+            onCloseRequest = { allSectionState.errorMessage = "" },
+            title = { Text("Error!") },
+            text = { Text(allSectionState.errorMessage) },
+            buttons = { Button(text = "Cool", onClick = { allSectionState.errorMessage = "" }) }
+        )
     }
 }
 
@@ -92,6 +104,7 @@ class AllSectionState(private val repository: Repository) {
         const val TAG = "AllSectionState"
     }
 
+    var errorMessage = ""
     val requests: ModelList<Request> = modelListOf()
     var isLoading: Boolean = false
 
@@ -115,7 +128,12 @@ class AllSectionState(private val repository: Repository) {
 
                     Log.d(MySectionState.TAG, "Successfully retrieved all open requests")
                 } else {
-                    Log.d(MySectionState.TAG, "Failed retrieving all open requests")
+                    val responseErrorMessage = response.getErrorMessage()
+                    errorMessage = responseErrorMessage
+                    Log.d(
+                        MySectionState.TAG,
+                        "Failed retrieving all open requests. Error: $responseErrorMessage"
+                    )
                 }
                 isLoading = false
             }
@@ -139,9 +157,11 @@ class AllSectionState(private val repository: Repository) {
                         "Successfully changed request ${responseRequest.name} status to ${request.status}"
                     )
                 } else {
+                    val responseErrorMessage = response.getErrorMessage()
+                    errorMessage = responseErrorMessage
                     Log.d(
                         MySectionState.TAG,
-                        "Failed changing request ${request.name} status to ${request.status}"
+                        "Failed changing request ${request.name} status to ${request.status}. Error: $responseErrorMessage"
                     )
                 }
                 isLoading = false

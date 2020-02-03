@@ -7,17 +7,21 @@ import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
 import androidx.ui.core.ContextAmbient
 import androidx.ui.core.EditorModel
+import androidx.ui.core.Text
 import androidx.ui.input.KeyboardType
 import androidx.ui.layout.*
+import androidx.ui.material.AlertDialog
 import androidx.ui.material.Button
 import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.unit.dp
+import com.deniskrr.exam.extensions.getErrorMessage
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
 import com.deniskrr.exam.repository.remote.RemoteRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 
 @Composable
 fun MySectionScreen() {
@@ -30,9 +34,20 @@ fun MySectionScreen() {
     Container(padding = EdgeInsets(16.dp)) {
         MySectionContent(mySectionState)
     }
+
     if (mySectionState.isLoading) Center {
         CircularProgressIndicator()
     }
+
+    if (mySectionState.errorMessage.isNotBlank()) {
+        AlertDialog(
+            onCloseRequest = { mySectionState.errorMessage = "" },
+            title = { Text("Error!") },
+            text = { Text(mySectionState.errorMessage) },
+            buttons = { Button(text = "Cool", onClick = { mySectionState.errorMessage = "" }) }
+        )
+    }
+
 }
 
 @Composable
@@ -123,6 +138,7 @@ class MySectionState(
         const val STUDENT_PREFS_KEY = "Student"
     }
 
+    var errorMessage: String = ""
     var isLoading: Boolean = false
     var studentName: String
         get() = sharedPreferences.getString(STUDENT_PREFS_KEY, "")!!
@@ -144,7 +160,12 @@ class MySectionState(
                     val responseRequest = response.body()!!
                     Log.d(TAG, "Successfully recorded request ${responseRequest.name}")
                 } else {
-                    Log.d(TAG, "Failed recording request ${request.name}")
+                    val responseErrorMessage = response.getErrorMessage()
+                    errorMessage = responseErrorMessage
+                    Log.d(
+                        TAG,
+                        "Failed recording request ${request.name}. Error: $responseErrorMessage"
+                    )
                 }
                 isLoading = false
             }
@@ -170,7 +191,12 @@ class MySectionState(
 
                     Log.d(TAG, "Successfully retrieved requests of $studentName")
                 } else {
-                    Log.d(TAG, "Failed retrieving requests of $studentName")
+                    val responseErrorMessage = response.getErrorMessage()
+                    errorMessage = responseErrorMessage
+                    Log.d(
+                        TAG,
+                        "Failed retrieving requests of $studentName. . Error: $responseErrorMessage"
+                    )
                 }
                 isLoading = false
             }

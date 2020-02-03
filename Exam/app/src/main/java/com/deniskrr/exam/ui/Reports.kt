@@ -6,13 +6,16 @@ import androidx.compose.Model
 import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
 import androidx.compose.remember
+import androidx.ui.core.Text
 import androidx.ui.layout.Center
 import androidx.ui.layout.Column
 import androidx.ui.layout.Container
 import androidx.ui.layout.EdgeInsets
+import androidx.ui.material.AlertDialog
 import androidx.ui.material.Button
 import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.unit.dp
+import com.deniskrr.exam.extensions.getErrorMessage
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
 import com.deniskrr.exam.repository.remote.RemoteRepository
@@ -30,6 +33,15 @@ fun ReportsScreen() {
 
     if (reportsState.isLoading) Center {
         CircularProgressIndicator()
+    }
+
+    if (reportsState.errorMessage.isNotBlank()) {
+        AlertDialog(
+            onCloseRequest = { reportsState.errorMessage = "" },
+            title = { Text("Error!") },
+            text = { Text(reportsState.errorMessage) },
+            buttons = { Button(text = "Cool", onClick = { reportsState.errorMessage = "" }) }
+        )
     }
 }
 
@@ -59,6 +71,7 @@ class ReportsState(private val repository: Repository) {
         const val TAG = "Reports"
     }
 
+    var errorMessage = ""
     var isLoading: Boolean = false
     val requests: ModelList<Request> = modelListOf()
 
@@ -86,7 +99,12 @@ class ReportsState(private val repository: Repository) {
                         "Successfully retrieved filled requests sorted by cost"
                     )
                 } else {
-                    Log.d(TAG, "Failed retrieving filled requests sorted by cost")
+                    val responseErrorMessage = response.getErrorMessage()
+                    errorMessage = responseErrorMessage
+                    Log.d(
+                        TAG,
+                        "Failed retrieving filled requests sorted by cost. Error: $responseErrorMessage"
+                    )
                 }
                 isLoading = false
             }
