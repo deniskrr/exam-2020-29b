@@ -1,12 +1,10 @@
 package com.deniskrr.exam.ui
 
 import android.util.Log
-import androidx.compose.Composable
-import androidx.compose.Model
+import androidx.compose.*
 import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
-import androidx.compose.remember
-import androidx.compose.state
+import androidx.ui.core.ContextAmbient
 import androidx.ui.core.EditorModel
 import androidx.ui.core.Text
 import androidx.ui.foundation.VerticalScroller
@@ -17,6 +15,7 @@ import androidx.ui.material.Button
 import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.unit.dp
 import com.deniskrr.exam.extensions.getErrorMessage
+import com.deniskrr.exam.isConnected
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
 import com.deniskrr.exam.repository.remote.RemoteRepository
@@ -67,14 +66,19 @@ private fun AllSectionContent(allSectionState: AllSectionState) {
         Spacer(modifier = LayoutHeight(8.dp))
         ExamTextField(label = "Status", editorModel = statusEditorModel)
         Spacer(modifier = LayoutHeight(8.dp))
+        val context = ambient(key = ContextAmbient)
         Button(text = "Change", onClick = {
-            allSectionState.changeRequestStatus(
-                Request(
-                    id = idEditorModel.value.text.toInt(),
-                    cost = costEditorModel.value.text.toInt(),
-                    status = statusEditorModel.value.text
+            if (isConnected(context)) {
+                allSectionState.changeRequestStatus(
+                    Request(
+                        id = idEditorModel.value.text.toInt(),
+                        cost = costEditorModel.value.text.toInt(),
+                        status = statusEditorModel.value.text
+                    )
                 )
-            )
+            } else {
+                allSectionState.errorMessage = "You are not connected to Internet"
+            }
         })
         Spacer(modifier = LayoutHeight(16.dp))
         RequestList(allSectionState = allSectionState)
@@ -83,10 +87,14 @@ private fun AllSectionContent(allSectionState: AllSectionState) {
 
 @Composable
 private fun RequestList(allSectionState: AllSectionState) {
-
     Column {
+        val context = ambient(key = ContextAmbient)
         Button(text = "See all requests", onClick = {
-            allSectionState.getOpenRequests()
+            if (isConnected(context)) {
+                allSectionState.getOpenRequests()
+            } else {
+                allSectionState.errorMessage = "You are not connected to Internet"
+            }
         })
         VerticalScroller {
             Column {

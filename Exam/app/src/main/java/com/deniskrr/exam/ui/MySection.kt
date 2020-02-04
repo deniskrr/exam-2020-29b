@@ -104,6 +104,7 @@ fun RequestRecorder(mySectionState: MySectionState) {
                 }
                 mySectionState.recordRequest(request)
             } else {
+                mySectionState.errorMessage = "You are not connected to Internet"
                 mySectionState.recordRequestInMemory(request)
             }
         })

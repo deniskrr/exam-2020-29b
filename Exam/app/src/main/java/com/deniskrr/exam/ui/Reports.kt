@@ -3,9 +3,11 @@ package com.deniskrr.exam.ui
 import android.util.Log
 import androidx.compose.Composable
 import androidx.compose.Model
+import androidx.compose.ambient
 import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
 import androidx.compose.remember
+import androidx.ui.core.ContextAmbient
 import androidx.ui.core.Text
 import androidx.ui.layout.Center
 import androidx.ui.layout.Column
@@ -16,6 +18,7 @@ import androidx.ui.material.Button
 import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.unit.dp
 import com.deniskrr.exam.extensions.getErrorMessage
+import com.deniskrr.exam.isConnected
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
 import com.deniskrr.exam.repository.remote.RemoteRepository
@@ -48,8 +51,13 @@ fun ReportsScreen() {
 @Composable
 fun ReportsContent(reportsState: ReportsState) {
     Column {
+        val context = ambient(key = ContextAmbient)
         Button(text = "Show filled requests", onClick = {
-            reportsState.getFilledRequestDescendingByCost()
+            if (isConnected(context)) {
+                reportsState.getFilledRequestDescendingByCost()
+            } else {
+                reportsState.errorMessage = "You are not connected to Internet"
+            }
         })
         RequestList(reportsState)
     }
