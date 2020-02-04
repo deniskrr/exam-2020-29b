@@ -15,6 +15,7 @@ import androidx.ui.material.Button
 import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.unit.dp
 import com.deniskrr.exam.extensions.getErrorMessage
+import com.deniskrr.exam.isConnected
 import com.deniskrr.exam.model.Request
 import com.deniskrr.exam.repository.Repository
 import com.deniskrr.exam.repository.remote.RemoteRepository
@@ -85,6 +86,7 @@ fun RequestRecorder(mySectionState: MySectionState) {
             keyboardType = KeyboardType.Number
         )
         Spacer(modifier = LayoutHeight(16.dp))
+        val context = ambient(key = ContextAmbient)
 
         Button(text = "Send request", onClick = {
             val request = Request(
@@ -96,7 +98,14 @@ fun RequestRecorder(mySectionState: MySectionState) {
                 costEditorModel.value.text.toInt()
             )
 
-            mySectionState.recordRequest(request)
+            if (isConnected(context)) {
+                mySectionState.offlineRequests.forEach { request ->
+                    mySectionState.recordRequest(request) // Add requests that were saved in-memory last time there was no connection
+                }
+                mySectionState.recordRequest(request)
+            } else {
+                mySectionState.recordRequestInMemory(request)
+            }
         })
     }
 }
@@ -145,7 +154,20 @@ class MySectionState(
         set(value) =
             sharedPreferences.edit().putString(STUDENT_PREFS_KEY, value).apply()
 
+    val offlineRequests: MutableList<Request> = mutableListOf()
     val requests: ModelList<Request> = modelListOf()
+
+    fun recordRequestInMemory(request: Request) {
+        isLoading = true
+        offlineRequests.add(request)
+        isLoading = false
+    }
+
+    fun deleteRequestFromMemory(request: Request) {
+        isLoading = true
+        offlineRequests.remove(request)
+        isLoading = false
+    }
 
     fun recordRequest(request: Request) {
         isLoading = true
@@ -166,6 +188,7 @@ class MySectionState(
                         TAG,
                         "Failed recording request ${request.name}. Error: $responseErrorMessage"
                     )
+                    deleteRequestFromMemory(request)
                 }
                 isLoading = false
             }
