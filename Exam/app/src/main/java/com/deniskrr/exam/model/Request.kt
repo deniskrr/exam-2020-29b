@@ -1,7 +1,11 @@
 package com.deniskrr.exam.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 data class Request(
-    val id: Int = 0,
+    @PrimaryKey val id: Int = 0,
     val name: String = "",
     val status: String = "",
     val student: String = "",
